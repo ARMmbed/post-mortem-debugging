@@ -1,0 +1,12 @@
+{
+	"name": "crashing-app",
+	"license": "WTFPL",
+	"bin": "./source",
+	"version": "0.0.0",
+	"keywords": [],
+	"author": "Jan Jongboom <jan.jongboom@arm.com>",
+	"private": false,
+	"dependencies": {},
+	"targetDependencies": {},
+	"testDependencies": {}
+}
