@@ -3,3 +3,7 @@ build/
 yotta_modules/
 yotta_targets/
 .workspace
+rom.*
+ram.*
+uvision.ini
+.yotta.json
