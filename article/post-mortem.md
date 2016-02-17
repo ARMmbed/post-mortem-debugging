@@ -89,11 +89,11 @@ BLX           r3              // Branch with Link
 
 ![Disassembly leading up to the crash](assets/uvision5.png)
 
-The value of R7 thus points us in the direction of the actual call that was just made. Open a new watch window, via View > Watch Windows > Watch 1 to find out which function was called...
+The value of R7,#0x14 (0x1fff9fd0 + 0x14) thus points us in the direction of the actual call that was just made. Open a new watch window, via View > Watch Windows > Watch 1 to find out which function was called. Add a watch to `(void*)(0x1FFF9fd0 + 0x14)` in the watch window, and inspect the value of the pointer (in this case `0x1f59`).
 
 ![Watch window showing the location of the function](assets/uvision6.png)
 
-Add a watch to `(void*)(0x1FFF9fd0 + 0x14)` in the watch window, and inspect the value of the pointer (in this case `0x1f59`). We can now navigate to this value in the disassembly window, and...
+ We can now navigate to this value in the disassembly window, and...
 
 ![Found it!](assets/uvision7.png)
 
