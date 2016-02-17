@@ -1,5 +1,5 @@
 {
-  "name": "crashing-app",
+  "name": "write-to-address-zero",
   "license": "WTFPL",
   "bin": "./source",
   "version": "0.0.0",
