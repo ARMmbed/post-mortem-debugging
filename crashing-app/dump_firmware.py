@@ -49,43 +49,43 @@ copyfile(join(yotta_build_path, potential_axf[0]), "crashdump/" + potential_axf[
 with MbedBoard.chooseBoard(frequency=10000000) as board:
     print "[2/6] Build verified. Connecting to board..."
 
-    # memory_map = board.target.getMemoryMap()
-    # ram_regions = [region for region in memory_map if region.type == 'ram']
-    # ram_region = ram_regions[0]
-    # rom_region = memory_map.getBootMemory()
-    # target_type = board.getTargetType()
+    memory_map = board.target.getMemoryMap()
+    ram_regions = [region for region in memory_map if region.type == 'ram']
+    ram_region = ram_regions[0]
+    rom_region = memory_map.getBootMemory()
+    target_type = board.getTargetType()
 
-    # print "[3/6] Board recognized as %s. Downloading ROM..." % target_type
+    print "[3/6] Board recognized as %s. Downloading ROM..." % target_type
 
-    # addr = rom_region.start
-    # size = rom_region.length
-    # data = board.target.readBlockMemoryUnaligned8(addr, size)
-    # data = bytearray(data)
-    # with open("crashdump/rom.bin", 'wb') as f:
-    #     f.write(data)
-    # ih = IntelHex()
-    # ih.puts(addr, data)
-    # ih.tofile("crashdump/rom.hex", format='hex')
+    addr = rom_region.start
+    size = rom_region.length
+    data = board.target.readBlockMemoryUnaligned8(addr, size)
+    data = bytearray(data)
+    with open("crashdump/rom.bin", 'wb') as f:
+        f.write(data)
+    ih = IntelHex()
+    ih.puts(addr, data)
+    ih.tofile("crashdump/rom.hex", format='hex')
 
-    # print "[4/6] Dumped ROM. Downloading RAM..."
+    print "[4/6] Dumped ROM. Downloading RAM..."
 
-    # addr = ram_region.start
-    # size = ram_region.length
-    # data = board.target.readBlockMemoryUnaligned8(addr, size)
-    # data = bytearray(data)
-    # with open("crashdump/ram.bin", 'wb') as f:
-    #     f.write(data)
-    # ih = IntelHex()
-    # ih.puts(addr, data)
-    # ih.tofile("crashdump/ram.hex", format='hex')
+    addr = ram_region.start
+    size = ram_region.length
+    data = board.target.readBlockMemoryUnaligned8(addr, size)
+    data = bytearray(data)
+    with open("crashdump/ram.bin", 'wb') as f:
+        f.write(data)
+    ih = IntelHex()
+    ih.puts(addr, data)
+    ih.tofile("crashdump/ram.hex", format='hex')
 
-    # print "[5/6] Dumped RAM. Creating uVision project..."
+    print "[5/6] Dumped RAM. Creating uVision project..."
 
-    # with open("crashdump/uvision.ini", 'w') as f:
-    #     f.write('load ram.hex\n')
-    #     for reg in reg_list:
-    #         reg_val = board.target.readCoreRegister(reg)
-    #         f.write('%s=0x%x\n' % (reg, reg_val))
+    with open("crashdump/uvision.ini", 'w') as f:
+        f.write('load ram.hex\n')
+        for reg in reg_list:
+            reg_val = board.target.readCoreRegister(reg)
+            f.write('%s=0x%x\n' % (reg, reg_val))
 
     uvision_projx = """<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_projx.xsd">
@@ -737,4 +737,4 @@ with MbedBoard.chooseBoard(frequency=10000000) as board:
     with open("crashdump/" + potential_axf[0] + ".uvoptx", 'w') as f:
         f.write(uvision_optx)
 
-    print "[6/6] Done"
+    print "[6/6] Done. Open 'crashdump/%s.uvprojx' in uVision 5 to debug." % potential_axf[0]
