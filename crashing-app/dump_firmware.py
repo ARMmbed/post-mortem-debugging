@@ -45,9 +45,9 @@ if len(potential_axf) != 1:
     raise Exception("Found %d files without extension in %s, expected 1" % (len(potential_axf), yotta_build_path))
 copyfile(join(yotta_build_path, potential_axf[0]), "crashdump/" + potential_axf[0] + ".axf")
 
+print "[2/6] Build verified. Connecting to board..."
 
 with MbedBoard.chooseBoard(frequency=10000000) as board:
-    print "[2/6] Build verified. Connecting to board..."
 
     memory_map = board.target.getMemoryMap()
     ram_regions = [region for region in memory_map if region.type == 'ram']
