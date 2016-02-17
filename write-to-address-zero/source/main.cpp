@@ -1,17 +1,18 @@
 #include "mbed-drivers/mbed.h"
 
+static InterruptIn btn(SW2);
+
 static void blinky(void) {
     static DigitalOut led(LED1);
     led = !led;
-    printf("LED = %d \r\n",led.read());
 }
 
-static void crash(void) {
-    *(uint32_t * )NULL = 0xDEADBEEF;
+static void btn_interrupt() {
+    *(uint16_t*)0x0 = 0xDEAD;
 }
 
 void app_start(int, char**) {
     minar::Scheduler::postCallback(blinky).period(minar::milliseconds(500));
-    
-    minar::Scheduler::postCallback(crash).delay(minar::milliseconds(2300));
+
+    btn.fall(&btn_interrupt);
 }
