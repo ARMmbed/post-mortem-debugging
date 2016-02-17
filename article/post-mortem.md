@@ -40,9 +40,9 @@ void app_start(int, char**) {
 
 Build this application with debug symbols enabled (via `yt build -d`) and flash it on your device. The LED should start blinking until you hit `SW2` and the device freezes.
 
-## Starting a post-mortem debug session
+### Starting a post-mortem debug session
 
-For convenience we created a Python script which can pull the data off the device, and create a uVision 5 project in a single command. Download [dump-firmware.py](https://github.com/janjongboom/mbed-post-mortem-debugging/blob/master/crashing-app/dump_firmware.py) and store it in the same directory as your mbed OS project.
+For convenience we created a Python script which can pull the data off the device, and create a uVision 5 project in a single command. Download [dump-firmware.py](https://github.com/janjongboom/mbed-post-mortem-debugging/blob/master/dump_firmware.py) and store it in the same directory as your mbed OS project.
 
 > If you use virtualenv to run yotta, run this script in the same virtualenv environment. On Windows, run this script from 'Run yotta' in your start menu.
 
@@ -60,34 +60,34 @@ write-to-address-zero $ python dump_firmware.py
 
 A crashdump folder is now created which contains debug symbols, the RAM and ROM of the device, and a uVision 5 project file. Double click on the project file to open uVision.
 
-## Loading the session in uVision 5
+### Loading the session in uVision 5
 
 > Unfortunately you might not be able to run the debug session in a unlicensed version of uVision 5, depending on the size of your RAM.
 
-![Start a debug session](assets/uvision1.png)
-
 In uVision, choose Debug > Start/Stop Debug Session to start.
 
-![Step into the hardfault handler](assets/uvision2.png)
+![Start a debug session](assets/uvision1.png)
 
 In the Disassembly panel we see that we're in the `HardFault_Handler`, which is expected. We can drill down into the stack, by selecting Debug > Step.
 
+![Step into the hardfault handler](assets/uvision2.png)
+
+Now we get more information about the state of the application. On the right bottom corner we see the Call Stack that led up to the crash. We can see we passed an interrupt on a GPIO port (`gpio_irqC`), going through an InterruptIn handler (`handle_inerrupt_in`), and then through a function pointer with zero arguments and return type `void` (`FunctionPointer0<void>`). Although this does not point us straight at the name of the calling function, it helps us pinpoint which functions in our application could be the culprit.
+
 ![Overview window](assets/uvision3.png)
 
-Now we get more information about the state of the application. On the right bottom corner we see the Call Stack that led up to the crash. We can see we passed an interrupt on a GPIO port (`gpio_irqC`), going through an InterruptIn handler (`handle_inerrupt_in`), and then through a function pointer with zero arguments and return type `void` (`FunctionPointer0<void>`). Although this does not point us straight at the name of the calling function, it helps us pinpoint which functions in our application could be the culprit. Let's look at some assembly.
+Let's look at some assembly. Right click on 'staticcaller', and select 'Show Callee Code'.
 
-![Overview window](assets/uvision4.png)
+![Show callee code](assets/uvision4.png)
 
-Right click on 'staticcaller', and select 'Show Callee Code'. We now jump into the disassembled source.
-
-![Disassembly leading up to the crash](assets/uvision5.png)
-
-If you're lucky, you jump straight into the function that crashed. Unfortunately this is not the case. Apparently the function managed to return before the hard fault happened, which we can see because straight before the crash we see a function call:
+We now jump into the disassembled source. If you're lucky, you jump straight into the function that crashed. Unfortunately this is not the case. Apparently the function managed to return before the hard fault happened, which we can see because straight before the crash we see a function call:
 
 ```
 LDR           r3,[r7,#0x14]   // Load word from memory
 BLX           r3              // Branch with Link
 ```
+
+![Disassembly leading up to the crash](assets/uvision5.png)
 
 The value of R7 thus points us in the direction of the actual call that was just made. Open a new watch window, via View > Watch Windows > Watch 1 to find out which function was called...
 
@@ -98,3 +98,37 @@ Add a watch to `(void*)(0x1FFF9fd0 + 0x14)` in the watch window, and inspect the
 ![Found it!](assets/uvision7.png)
 
 We found our function! We're trying to store the value in R2 (`0xDEAD`) in R3 (`0x0`).
+
+## Never-ending loops
+
+We can not just detect crashes, but the approach above can also be used when a device hangs because it entered a never-terminating loop. Let's look at the following code:
+
+```cpp
+#include "mbed-drivers/mbed.h"
+
+static void my_loop_function(void) {
+    uint8_t turns = 20;
+
+    while(turns-- > -1) {
+        wait_ms(5);
+    }
+}
+
+void app_start(int, char**) {
+    minar::Scheduler::postCallback(my_loop_function).delay(minar::milliseconds(500));
+}
+```
+
+Here `turns-- > -1` will never be true, as turns is a `uint32_t`, thus blocking the device. When we start a post-mortem debug session, we can immediately see the function that we are currently stuck in.
+
+![The Call Stack is pretty clear about this](assets/uvision8.png)
+
+## Conclusion
+
+CMSIS-DAP on ARM mbed OS can be a tremendous help with hard to find issues. The ability to recover a crashed device from the field, and use post-mortem debugging on it, is a great addition to the toolchain of every developer.
+
+To replicate the tests we did in this article, take a look at [mbed-post-mortem-debugging on GitHub](https://github.com/janjongboom/mbed-post-mortem-debugging). Here you'll find the python script used, and all source code used in this article. Happy disassembling!
+
+---
+
+*This article was written by [Russ Butler](https://github.com/c1728p9) (Embedded Software Engineer working on DAPLink and pyOCD) and [Jan Jongboom](https://twitter.com/janjongboom) (Developer Evangelist IoT).*

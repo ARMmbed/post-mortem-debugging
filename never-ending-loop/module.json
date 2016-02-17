@@ -1,0 +1,12 @@
+{
+  "name": "never-ending-loop",
+  "version": "0.0.0",
+  "bin": "./source",
+  "private": true,
+  "description": "Loop that never ends...",
+  "author": "Jan Jongboom <jan.jongboom@arm.com>",
+  "license": "WTFPL",
+  "dependencies": {
+    "mbed-drivers": "~0.12.1"
+  }
+}
