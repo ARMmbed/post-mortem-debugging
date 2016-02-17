@@ -119,7 +119,7 @@ void app_start(int, char**) {
 }
 ```
 
-Here `turns-- > -1` will never be true, as turns is a `uint32_t`, thus blocking the device. When we start a post-mortem debug session, we can immediately see the function that we are currently stuck in.
+Here `turns-- > -1` will never be true, as turns is a `uint8_t`, thus blocking the device. When we start a post-mortem debug session, we can immediately see the function that we are currently stuck in.
 
 ![The Call Stack is pretty clear about this](assets/uvision8.png)
 
