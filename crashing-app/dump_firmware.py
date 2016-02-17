@@ -31,7 +31,7 @@ print "[1/6] Using build directory '%s', verifying build..." % yotta_build_path
 p = subprocess.Popen("cmake -N -L build/" + yotta_target + "/", shell=True, stdout=subprocess.PIPE)
 build_types = [l for l in p.stdout.readlines() if l.startswith("CMAKE_BUILD_TYPE:STRING=")]
 if len(build_types) != 1:
-    raise Exception("Cannot find CMAKE_BUILD_TYPE (cmake -N -L build/%s/)" % yotta_target)
+    raise Exception("Cannot find CMAKE_BUILD_TYPE (cmake -N -L build/%s/). Did you build first ('yt build -d')?" % yotta_target)
 build_type = build_types[0].strip().split("=")[1]
 if build_type != "Debug":
     raise Exception("CMAKE_BUILD_TYPE was '%s', expected 'Debug'. Rebuild with `yt build -d`." % build_type)
