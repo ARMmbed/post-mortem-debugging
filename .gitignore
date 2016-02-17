@@ -7,3 +7,4 @@ rom.*
 ram.*
 uvision.ini
 .yotta.json
+crashdump/
