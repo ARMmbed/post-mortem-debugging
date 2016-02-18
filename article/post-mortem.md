@@ -9,9 +9,10 @@ In this blog post we'll show you how to install all dependencies, crash a device
 1. [A development board](https://www.mbed.com/en/development/hardware/boards/) capable of running mbed OS.
 1. [yotta](http://yottadocs.mbed.com/#installing) - to build faulty firmware.
 1. [ARM KEIL uVision 5](http://www2.keil.com/mdk5/install/) - to load the debug session. On OS X, run uVision in VMWare Fusion; it won't install in VirtualBox.
-1. [dump_firmware.py](https://github.com/janjongboom/mbed-post-mortem-debugging/blob/master/dump_firmware.py) - a Python script that can dump the RAM and ROM off a device, and creates a uVision 5 project in a single command. Store this file in the same directory as your mbed OS project.
+> **Note:** Unfortunately, you may not be able to run the debug session in an unlicensed version of uVision 5. This depends on the size of your RAM, because of the debugger's [32 Kbyte program limit](http://www.keil.com/demo/limits.asp).
 
-**Note:** Unfortunately, you may not be able to run the debug session in an unlicensed version of uVision 5. This depends on the size of your RAM, because of the debugger's [32 Kbyte program limit](http://www.keil.com/demo/limits.asp).
+1. Download [dump_firmware.py](https://github.com/janjongboom/mbed-post-mortem-debugging/blob/master/dump_firmware.py) - a Python script that dumps the RAM and ROM off a device, and sets up a uVision 5 project. Store this file in the same directory as your mbed OS project.
+
 
 This article assumes knowledge of building applications for mbed OS. If you're unfamiliar with mbed OS, read [Running your first mbed OS application](https://docs.mbed.com/docs/getting-started-mbed-os/en/latest/FirstProjectmbedOS/) first.
 
@@ -46,9 +47,9 @@ Build this application with debug symbols enabled (use `yt build -d`) and flash 
 
 ### Starting a post-mortem debug session
 
-**Note:** If you’re using virtualenv to run yotta, run this script in the same virtualenv environment. On Windows, run this script from 'Run yotta' in your start menu.
+Now we can put the [dump_firmware.py](https://github.com/janjongboom/mbed-post-mortem-debugging/blob/master/dump_firmware.py) Python script to good use. Run the script with the crashed device plugged in:
 
-Run the script with the crashed device plugged in:
+**Note:** If you’re using virtualenv to run yotta, run this script in the same virtualenv environment. On Windows, run this script from 'Run yotta' in your start menu.
 
 ```bash
 write-to-address-zero $ python dump_firmware.py
